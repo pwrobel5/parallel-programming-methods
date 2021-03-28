@@ -4,12 +4,10 @@
 #include <math.h>
 #include <mpi/mpi.h>
 
-#define DESIRED_ARGC 3
+#define DESIRED_ARGC 2
 #define POINTS_NUMBER_POSITION 1
-#define OUTPUT_FILE_POSITION 2
 #define CIRCLE_RADIUS 1.0
-#define RANDOM_SEED 2137
-#define PI (atan(1.0) * 4.0)
+#define RANDOM_SEED 200
 
 int is_point_in_circle(double x, double y)
 {
@@ -27,7 +25,6 @@ int main(int argc, char* argv[])
     }
 
     unsigned long long int global_points_number = atoll(argv[POINTS_NUMBER_POSITION]);
-    char* output_file_name = argv[OUTPUT_FILE_POSITION];
     double t_start = 0.0;
     double t_stop = 0.0;
     int rank, num_proc;
@@ -56,19 +53,7 @@ int main(int argc, char* argv[])
         long double pi_approximation = 4.0 * (long double) global_points_in_circle / global_points_number;
         t_stop = MPI_Wtime();
         double time_in_s = t_stop - t_start;
-        printf("PI approximation: %Lf\n", pi_approximation);
         printf("Time: %f s\n", time_in_s);
-
-        FILE* output_file = fopen(output_file_name, "a");
-        if(output_file == NULL)
-        {
-            perror("Error with opening output file");
-            MPI_Finalize();
-            exit(EXIT_FAILURE);
-        }
-
-        fprintf(output_file, "%d %lld %f\n", num_proc, global_points_number, time_in_s);
-        fclose(output_file);
     }
 
     MPI_Finalize();
